@@ -1,3 +1,4 @@
+---
 - name: systemd_resolved | Checking If systemd-resolved Service Is Present
   command: systemctl status systemd-resolved.service
   register: _dnsmasq_systemd_resolved_check
@@ -12,7 +13,7 @@
   become: true
   register: _dnsmasq_systemd_resolved_disabled
   notify:
-    - restart dnsmasq
+    - dnsmasq restart
   when: _dnsmasq_systemd_resolved_check['rc'] == 0
 
 - name: systemd_resolved | Checking If /etc/resolv.conf Exists
@@ -40,4 +41,5 @@
     mode: o=rw,g=r,o=r
   become: true
   notify:
-    - restart dnsmasq
+    - dnsmasq restart
+
