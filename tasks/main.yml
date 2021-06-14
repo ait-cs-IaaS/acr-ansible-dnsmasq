@@ -5,7 +5,12 @@
           name: dnsmasq
           state: present
   tags: [install]
-                
+
+- include: systemd_resolved.yml
+  when:
+    - ansible_service_mgr == "systemd"
+    - dnsmasq_systemd_resolved_disable
+
 - name: config dnsmasq
   copy:
           content: "{{item.content}}"
@@ -14,3 +19,4 @@
   notify:
           - dnsmasq restart
   tags: [config]
+
