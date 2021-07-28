@@ -1,25 +1,21 @@
-Role Name
-=========
+# Ansible-Role: dnsmasq
 
 Installs and configures dnsmasq. It saves all configs as seperate files in /etc/dnsmasq.d
 
-Requirements
-------------
+## Requirements
 
-- Debian or Ubuntu
+- Debian or Ubuntu (18.04 or newer)
 
-Role Variables
---------------
+## Role Variables
 
-dnsmasq_config
+```
+dnsmasq_config: []
+```
+```
+dnsmasq_systemd_resolved_disable: false 
+```
 
-Dependencies
-------------
-
-No dependencies
-
-Example Playbook
-----------------
+## Example Playbook
 
 ```
 - hosts: localhost
@@ -36,12 +32,10 @@ Example Playbook
 
 ```
 
-License
--------
+## License
 
-BSD
+GPL-3.0
 
-Author Information
-------------------
+## Author
 
 Wolfgang Hotwagner

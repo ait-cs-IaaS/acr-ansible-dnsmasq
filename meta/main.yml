@@ -1,16 +1,23 @@
+---
 galaxy_info:
-  author: your name
-  description: your description
-  company: your company (optional)
+  role_name: dnsmasq
+  author: Wolfgang Hotwagner
+  description: dnsmasq configuration
+  license: GPL-3.0
+  company: Austrian Institute of Technology
+  min_ansible_version: 2.1.0
+  platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+  categories:
+    - system
+    - networking
+    - dns
+    - dhcp
 
-
-  license: GPL-3.0 (GPLv2, CC-BY, etc)
-
-  min_ansible_version: 2.4
-
-
-
-
-  galaxy_tags: []
-
-dependencies: []
