@@ -1,22 +1,22 @@
 ---
 ## tasks file for dnsmasq
 - name: install dnsmasq
-  apt:
+  ansible.builtin.apt:
     name: dnsmasq
     state: present
+  become: true
   tags: [install]
 
 - include: systemd_resolved.yml
   when:
-    - ansible_service_mgr == "systemd"
     - dnsmasq_systemd_resolved_disable
 
 - name: config dnsmasq
-  copy:
-    content: "{{item.content}}"
-    dest: "/etc/dnsmasq.d/{{item.prio | default('10') }}-{{item.name}}.conf"
-  with_items: "{{dnsmasq_config}}"
-  notify:
-    - dnsmasq restart
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "/etc/dnsmasq.d/{{ item.prio | default('10') }}-{{ item.name }}.conf"
+    mode: 0644
+  become: true
+  with_items: "{{ dnsmasq_config }}"
+  notify: "dnsmasq restart"
   tags: [config]
-

@@ -1,38 +1,40 @@
 ---
 - name: systemd_resolved | Checking If systemd-resolved Service Is Present
-  command: systemctl status systemd-resolved.service
+  ansible.builtin.command: systemctl status systemd-resolved.service
   register: _dnsmasq_systemd_resolved_check
+  become: true
   changed_when: false
   failed_when: false
 
 - name: systemd_resolved | Disabling and Stopping systemd-resolved
-  service:
+  ansible.builtin.service:
     name: systemd-resolved
     state: stopped
     enabled: false
   become: true
   register: _dnsmasq_systemd_resolved_disabled
-  notify:
-    - dnsmasq restart
+  notify: "dnsmasq restart"
   when: _dnsmasq_systemd_resolved_check['rc'] == 0
 
 - name: systemd_resolved | Checking If /etc/resolv.conf Exists
-  stat:
+  ansible.builtin.stat:
     path: /etc/resolv.conf
   register: _dnsmasq_resolv_conf
 
 - name: systemd_resolved | Removing Existing /etc/resolv.conf If symlink
-  file:
+  ansible.builtin.file:
     path: /etc/resolv.conf
     state: absent
   become: true
+  tags:
+    - skip_ansible_lint
   register: _dnsmasq_resolv_conf_removed
   when:
     - _dnsmasq_systemd_resolved_disabled['changed']
     - _dnsmasq_resolv_conf['stat']['islnk']
 
 - name: systemd_resolved | Creating /etc/resolv.conf
-  copy:
+  ansible.builtin.copy:
     content: |
       nameserver 127.0.0.1
     dest: /etc/resolv.conf
@@ -40,6 +42,4 @@
     group: root
     mode: o=rw,g=r,o=r
   become: true
-  notify:
-    - dnsmasq restart
-
+  notify: "dnsmasq restart"

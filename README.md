@@ -8,16 +8,17 @@ Installs and configures dnsmasq. It saves all configs as seperate files in /etc/
 
 ## Role Variables
 
-```
+```yaml
 dnsmasq_config: []
 ```
-```
-dnsmasq_systemd_resolved_disable: false 
+
+```yaml
+dnsmasq_systemd_resolved_disable: false
 ```
 
 ## Example Playbook
 
-```
+```yaml
 - hosts: localhost
   roles:
           - dnsmasq
@@ -38,4 +39,5 @@ GPL-3.0
 
 ## Author
 
-Wolfgang Hotwagner
+- Wolfgang Hotwagner
+- Benjamin Akhras
