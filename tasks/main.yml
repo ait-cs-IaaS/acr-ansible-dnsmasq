@@ -7,7 +7,7 @@
   become: true
   tags: [install]
 
-- include: systemd_resolved.yml
+- include_tasks: systemd_resolved.yml
   when:
     - dnsmasq_systemd_resolved_disable
 
