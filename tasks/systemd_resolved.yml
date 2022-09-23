@@ -43,3 +43,7 @@
     mode: o=rw,g=r,o=r
   become: true
   notify: "dnsmasq restart"
+  tags:
+    - skip_ansible_lint
+  when:
+    - _dnsmasq_resolv_conf_removed['changed']

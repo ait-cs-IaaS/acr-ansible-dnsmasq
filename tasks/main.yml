@@ -20,3 +20,10 @@
   with_items: "{{ dnsmasq_config }}"
   notify: "dnsmasq restart"
   tags: [config]
+
+- name: dnsmasq enabled
+  ansible.builtin.service:
+    name: dnsmasq
+    state: running
+    enabled: true
+  become: true
