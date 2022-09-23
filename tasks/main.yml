@@ -1,6 +1,6 @@
 ---
 ## tasks file for dnsmasq
-- name: install dnsmasq
+- name: Install dnsmasq
   ansible.builtin.apt:
     name: dnsmasq
     state: present
@@ -11,19 +11,39 @@
   when:
     - dnsmasq_systemd_resolved_disable
 
-- name: config dnsmasq
-  ansible.builtin.copy:
-    content: "{{ item.content }}"
-    dest: "/etc/dnsmasq.d/{{ item.prio | default('10') }}-{{ item.name }}.conf"
+- name: Get current configs
+  ansible.builtin.shell:
+    chdir: /etc/dnsmasq.d
+    cmd: ls -1 *conf
+  register: current_configs
+  become: true
+  when: dnsmasq_manage_dir
+
+- name: Remove unmanaged configs
+  ansible.builtin.file:
+    path: /etc/dnsmasq.d/{{ item }}
+    state: absent
+  with_items: "{{ current_configs.stdout_lines }}"
+  become: true
+  when:
+    - dnsmasq_manage_dir
+    - item not in dnsmasq_managed_files
+
+- name: Config dnsmasq
+  ansible.builtin.template:
+    src: raw.conf.j2
+    dest: "/etc/dnsmasq.d/{{ item.name }}.conf"
     mode: 0644
+  vars:
+    content: "{{ item.content }}"
   become: true
   with_items: "{{ dnsmasq_config }}"
-  notify: "dnsmasq restart"
+  notify: "Restart dnsmasq"
   tags: [config]
 
-- name: dnsmasq enabled
+- name: Enable dnsmasq
   ansible.builtin.service:
     name: dnsmasq
-    state: running
+    state: started
     enabled: true
   become: true

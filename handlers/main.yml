@@ -1,6 +1,6 @@
 ---
 # handlers file for dnsmasq
-- name: dnsmasq restart
+- name: Restart dnsmasq
   ansible.builtin.service:
     name: dnsmasq
     state: restarted

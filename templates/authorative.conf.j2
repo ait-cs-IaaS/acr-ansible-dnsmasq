@@ -1,0 +1,37 @@
+bind-interfaces
+resolv-file=/etc/dnsmasq.d/dnsmasq-resolv.conf
+
+log-queries
+log-facility=/var/log/dnsmasq.log
+
+# Authorative
+{% if dns_authorative_server %}
+auth-server={{ dns_authorative_server }}
+{% for entry in dns_authorative_zones  %}
+auth-zone={{ entry.domain }}
+{% for dns_entry in entry.records %}
+host-record={{ dns_entry.hostname }}.{{ entry.domain }},{{ dns_entry.ip }}
+{% for alias in dns_entry.aliases %}
+host-record={{ alias }}.{{ entry.domain }},{{ dns_entry.ip }}
+{% endfor %}
+{% if 'apex' in dns_entry %}
+{% if dns_entry.apex %}
+host-record={{ entry.domain }},{{ dns_entry.ip }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+# Wildcard
+{% for entry in dns_wildcard_zones %}
+address=/{{ entry.domain }}/{{ entry.wildcard }}
+{% endfor %}
+
+# Upstream
+{% for _extra_server in dns_extra_servers %}
+server=/{{ _extra_server.domain }}/{{_extra_server.ip }}
+{% endfor %}
+{% if dns_upstream_server is defined %}
+server={{ dns_upstream_server }}
+{% endif %}
