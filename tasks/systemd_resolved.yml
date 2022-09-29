@@ -13,7 +13,7 @@
     enabled: false
   become: true
   register: _dnsmasq_systemd_resolved_disabled
-  notify: "dnsmasq restart"
+  notify: Restart dnsmasq
   when: _dnsmasq_systemd_resolved_check['rc'] == 0
 
 - name: Systemd_resolved | Checking If /etc/resolv.conf Exists
@@ -42,7 +42,7 @@
     group: root
     mode: o=rw,g=r,o=r
   become: true
-  notify: "dnsmasq restart"
+  notify: Restart dnsmasq
   tags:
     - skip_ansible_lint
   when:
