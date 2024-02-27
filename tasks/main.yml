@@ -1,49 +1,62 @@
 ---
-## tasks file for dnsmasq
-- name: Install dnsmasq
-  ansible.builtin.apt:
-    name: dnsmasq
-    state: present
+- name: Temporarly use upstream DNS server as main
   become: true
-  tags: [install]
+  ansible.builtin.lineinfile:
+      path: /etc/resolv.conf
+      regexp: ^nameserver\s+.*
+      line: nameserver {{ dnsmasq_bootstrap_upstream }}
+
+- name: Install dnsmasq
+  become: true
+  ansible.builtin.apt:
+      name: dnsmasq
+      state: present
+      update_cache: true
+      cache_valid_time: 3600
 
 - include_tasks: systemd_resolved.yml
-  when:
-    - dnsmasq_systemd_resolved_disable
+  when: dnsmasq_systemd_resolved_disable
 
 - name: Get current configs
-  ansible.builtin.shell:
-    chdir: /etc/dnsmasq.d
-    cmd: ls -1 *conf
-  register: current_configs
   become: true
+  ansible.builtin.shell:
+      chdir: /etc/dnsmasq.d
+      cmd: ls -1 *conf
+  register: current_configs
   when: dnsmasq_manage_dir
 
 - name: Remove unmanaged configs
-  ansible.builtin.file:
-    path: /etc/dnsmasq.d/{{ item }}
-    state: absent
-  with_items: "{{ current_configs.stdout_lines }}"
   become: true
+  ansible.builtin.file:
+      path: /etc/dnsmasq.d/{{ item }}
+      state: absent
+  with_items: '{{ current_configs.stdout_lines }}'
   when:
-    - dnsmasq_manage_dir
-    - item not in dnsmasq_managed_files
+      - dnsmasq_manage_dir
+      - item not in dnsmasq_managed_files
 
 - name: Config dnsmasq
-  ansible.builtin.template:
-    src: raw.conf.j2
-    dest: "/etc/dnsmasq.d/{{ item.name }}.conf"
-    mode: 0644
-  vars:
-    content: "{{ item.content }}"
-  become: true
-  with_items: "{{ dnsmasq_config }}"
-  notify: "Restart dnsmasq"
   tags: [config]
+  become: true
+  ansible.builtin.template:
+      src: raw.conf.j2
+      dest: '/etc/dnsmasq.d/{{ item.name }}.conf'
+      mode: 0644
+  vars:
+      content: '{{ item.content }}'
+  with_items: '{{ dnsmasq_config }}'
+  notify: 'Restart dnsmasq'
 
 - name: Enable dnsmasq
-  ansible.builtin.service:
-    name: dnsmasq
-    state: started
-    enabled: true
   become: true
+  ansible.builtin.service:
+      name: dnsmasq
+      state: started
+      enabled: true
+
+- name: Re-configure to use system resolver
+  become: true
+  ansible.builtin.lineinfile:
+      path: /etc/resolv.conf
+      regexp: ^nameserver\s+.*
+      line: nameserver 127.0.0.1
