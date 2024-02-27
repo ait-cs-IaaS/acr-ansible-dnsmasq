@@ -1,4 +1,4 @@
-# Ansible-Role: dnsmasq
+# Ansible-Role: acr-ansible-dnsmasq
 
 Installs and configures dnsmasq. It saves all configs as seperate files in /etc/dnsmasq.d
 
@@ -10,9 +10,7 @@ Installs and configures dnsmasq. It saves all configs as seperate files in /etc/
 
 ```yaml
 dnsmasq_config: []
-```
-
-```yaml
+dnsmasq_bootstrap_upstream: '8.8.8.8'
 dnsmasq_systemd_resolved_disable: false
 ```
 
@@ -21,7 +19,7 @@ dnsmasq_systemd_resolved_disable: false
 ```yaml
 - hosts: localhost
   roles:
-          - dnsmasq
+          - acr-ansible-dnsmasq
   vars:
       dnsmasq_config:
               - { name: "noname",  content: "lala" }
